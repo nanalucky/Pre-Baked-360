@@ -1,2 +1,7 @@
-
+Library/
+obj/
+Temp/
+.vs
+*.sln
+*.csproj
 README.md
