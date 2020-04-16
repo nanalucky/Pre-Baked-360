@@ -13,6 +13,18 @@ namespace UnityEngine.Rendering.Universal
         }
 
         [GenerateHLSL(PackingRules.Exact, false)]
+        public struct CookieData
+        {
+            // include cookieSize info
+            public Matrix4x4 worldToLightMatrix;
+
+            // 0: invalid
+            // positive: index of point lights' texCubes
+            // negative: index of spot lights' tex2Ds
+            public int cookieIndex;
+        }
+
+        [GenerateHLSL(PackingRules.Exact, false)]
         public struct ShadowData
         {
             public Matrix4x4 worldToShadowMatrix;

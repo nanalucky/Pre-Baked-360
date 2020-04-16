@@ -8,6 +8,7 @@ namespace UnityEngine.Rendering.Universal
         static ShaderData m_Instance = null;
         ComputeBuffer m_LightDataBuffer = null;
         ComputeBuffer m_LightIndicesBuffer = null;
+        ComputeBuffer m_CookieDataBuffer = null;
 
         ComputeBuffer m_ShadowDataBuffer = null;
         ComputeBuffer m_ShadowIndicesBuffer = null;
@@ -31,6 +32,7 @@ namespace UnityEngine.Rendering.Universal
         {
             DisposeBuffer(ref m_LightDataBuffer);
             DisposeBuffer(ref m_LightIndicesBuffer);
+            DisposeBuffer(ref m_CookieDataBuffer);
             DisposeBuffer(ref m_ShadowDataBuffer);
             DisposeBuffer(ref m_ShadowIndicesBuffer);
         }
@@ -43,6 +45,11 @@ namespace UnityEngine.Rendering.Universal
         internal ComputeBuffer GetLightIndicesBuffer(int size)
         {
             return GetOrUpdateBuffer<int>(ref m_LightIndicesBuffer, size);
+        }
+
+        internal ComputeBuffer GetCookieDataBuffer(int size)
+        {
+            return GetOrUpdateBuffer<ShaderInput.CookieData>(ref m_CookieDataBuffer, size);
         }
 
         internal ComputeBuffer GetShadowDataBuffer(int size)

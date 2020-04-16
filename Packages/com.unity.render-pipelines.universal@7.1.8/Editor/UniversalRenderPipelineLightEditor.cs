@@ -18,6 +18,7 @@ namespace UnityEditor.Rendering.Universal
         AnimBool m_AnimShadowAngleOptions = new AnimBool();
         AnimBool m_AnimShadowRadiusOptions = new AnimBool();
         AnimBool m_AnimLightBounceIntensity = new AnimBool();
+        AnimBool m_AnimCookieSizeOptions = new AnimBool();
 
         class Styles
         {
@@ -52,6 +53,7 @@ namespace UnityEditor.Rendering.Universal
         public bool pointOptionsValue { get { return typeIsSame && lightProperty.type == LightType.Point; } }
         public bool dirOptionsValue { get { return typeIsSame && lightProperty.type == LightType.Directional; } }
         public bool areaOptionsValue { get { return typeIsSame && (lightProperty.type == LightType.Rectangle || lightProperty.type == LightType.Disc); } }
+        public bool cookieSizeOptionsValue { get { return typeIsSame && lightProperty.type == LightType.Directional; } }
 
         // Point light realtime shadows not supported
         public bool runtimeOptionsValue { get { return typeIsSame && (lightProperty.type != LightType.Rectangle && lightProperty.type != LightType.Point && !settings.isCompletelyBaked); } }
@@ -155,6 +157,11 @@ namespace UnityEditor.Rendering.Universal
             settings.DrawRenderMode();
             settings.DrawCullingMask();
 
+            settings.DrawCookie();
+            using (var group = new EditorGUILayout.FadeGroupScope(m_AnimCookieSizeOptions.faded))
+                if (group.visible)
+                    settings.DrawCookieSize();
+
             EditorGUILayout.Space();
 
 #if UNITY_2019_1_OR_NEWER
@@ -203,6 +210,7 @@ namespace UnityEditor.Rendering.Universal
             SetOptions(m_AnimShadowAngleOptions, initialize, bakedShadowAngle);
             SetOptions(m_AnimShadowRadiusOptions, initialize, bakedShadowRadius);
             SetOptions(m_AnimLightBounceIntensity, initialize, showLightBounceIntensity);
+            SetOptions(m_AnimCookieSizeOptions, initialize, cookieSizeOptionsValue);
         }
 
         void DrawSpotAngle()

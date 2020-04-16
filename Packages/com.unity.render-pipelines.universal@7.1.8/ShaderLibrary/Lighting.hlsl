@@ -91,6 +91,80 @@ half AngleAttenuation(half3 spotDirection, half3 lightDirection, half2 spotAtten
     return atten * atten;
 }
 
+half SamplePointCookie(int cookieIndex, float4 lightCoord)
+{
+    switch(cookieIndex)
+    {
+    case 1:
+        return texCUBE(_PointCookieTexture1, lightCoord.xyz).w;
+    case 2:
+        return texCUBE(_PointCookieTexture2, lightCoord.xyz).w;
+    case 3:
+        return texCUBE(_PointCookieTexture3, lightCoord.xyz).w;
+    case 4:
+        return texCUBE(_PointCookieTexture4, lightCoord.xyz).w;
+    default:
+        return 1;
+	}
+}
+
+half SampleSpotCookie(int cookieIndex, float4 lightCoord)
+{
+    switch(cookieIndex)
+    {
+    case 1:
+        return tex2D(_SpotCookieTexture1, lightCoord.xy / lightCoord.w + 0.5).w;
+    case 2:
+        return tex2D(_SpotCookieTexture2, lightCoord.xy / lightCoord.w + 0.5).w;
+    case 3:
+        return tex2D(_SpotCookieTexture3, lightCoord.xy / lightCoord.w + 0.5).w;
+    case 4:
+        return tex2D(_SpotCookieTexture4, lightCoord.xy / lightCoord.w + 0.5).w;
+    default:
+        return 1;
+	}
+}
+
+// cookieIndex;
+// 0: invalid
+// positive: index of point lights' texCubes
+// negative: index of spot lights' tex2Ds
+half CookieAttenuation(int perObjectLightIndex, float3 positionWS)
+{
+    float cookieAttenuation = 1.0;
+#ifdef _ADDITIONAL_LIGHTS_COOKIE
+    #if USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
+        int cookieIndex = _AdditionalLightsCookieBuffer[perObjectLightIndex].cookieIndex;
+        if(cookieIndex > 0)
+        {
+            float4 lightCoord = mul(_AdditionalLightsCookieBuffer[perObjectLightIndex].worldToLightMatrix, float4(positionWS.xyz, 1));
+            cookieAttenuation = SamplePointCookie(cookieIndex, lightCoord);
+        }
+        else if(cookieIndex < 0)
+        {
+            cookieIndex = -cookieIndex;
+            float4 lightCoord = mul(_AdditionalLightsCookieBuffer[perObjectLightIndex].worldToLightMatrix, float4(positionWS.xyz, 1));
+            cookieAttenuation = SampleSpotCookie(cookieIndex, lightCoord);
+        }
+    #else
+        int cookieIndex = round(_AdditionalLightsCookieIndexs[perObjectLightIndex]);
+        if(cookieIndex > 0)
+        {
+            float4 lightCoord = mul(_AdditionalPointLightsWorldToLight[cookieIndex - 1], float4(positionWS.xyz, 1));
+            cookieAttenuation = SamplePointCookie(cookieIndex, lightCoord);
+        }
+        else if(cookieIndex < 0)
+        {
+            cookieIndex = -cookieIndex;
+            float4 lightCoord = mul(_AdditionalSpotLightsWorldToLight[cookieIndex - 1], float4(positionWS.xyz, 1));
+            cookieAttenuation = SampleSpotCookie(cookieIndex, lightCoord);
+        }
+    #endif
+#endif
+
+    return cookieAttenuation;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                      Light Abstraction                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,6 +179,7 @@ Light GetMainLight()
     // unity_ProbesOcclusion.x is the mixed light probe occlusion data
     light.distanceAttenuation *= unity_ProbesOcclusion.x;
 #endif
+
     light.shadowAttenuation = 1.0;
     light.color = _MainLightColor.rgb;
 
@@ -117,6 +192,16 @@ Light GetMainLight(float4 shadowCoord)
     light.shadowAttenuation = MainLightRealtimeShadow(shadowCoord);
     return light;
 }
+
+#ifdef _MAIN_LIGHT_COOKIE
+Light GetMainLight(float shadowCoord, float3 positionWS)
+{
+    Light light = GetMainLight(shadowCoord);
+    float2 lightCoord = mul(_MainLightWorldToLight, float4(positionWS.xyz, 1.0)).xy;
+    light.distanceAttenuation *= tex2D(_MainLightCookieTexture, lightCoord).w;
+    return light;        
+}
+#endif
 
 // Fills a light struct given a perObjectLightIndex
 Light GetAdditionalPerObjectLight(int perObjectLightIndex, float3 positionWS)
@@ -142,7 +227,7 @@ Light GetAdditionalPerObjectLight(int perObjectLightIndex, float3 positionWS)
     float distanceSqr = max(dot(lightVector, lightVector), HALF_MIN);
 
     half3 lightDirection = half3(lightVector * rsqrt(distanceSqr));
-    half attenuation = DistanceAttenuation(distanceSqr, distanceAndSpotAttenuation.xy) * AngleAttenuation(spotDirection.xyz, lightDirection, distanceAndSpotAttenuation.zw);
+    half attenuation = DistanceAttenuation(distanceSqr, distanceAndSpotAttenuation.xy) * AngleAttenuation(spotDirection.xyz, lightDirection, distanceAndSpotAttenuation.zw) * CookieAttenuation(perObjectLightIndex, positionWS);
 
     Light light;
     light.direction = lightDirection;
@@ -570,7 +655,11 @@ half4 UniversalFragmentPBR(InputData inputData, half3 albedo, half metallic, hal
     BRDFData brdfData;
     InitializeBRDFData(albedo, metallic, specular, smoothness, alpha, brdfData);
 
+#ifdef _MAIN_LIGHT_COOKIE
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS);
+#else
     Light mainLight = GetMainLight(inputData.shadowCoord);
+#endif
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
 
     half3 color = GlobalIllumination(brdfData, inputData.bakedGI, occlusion, inputData.normalWS, inputData.viewDirectionWS);

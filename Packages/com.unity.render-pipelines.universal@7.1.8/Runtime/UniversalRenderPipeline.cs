@@ -96,6 +96,13 @@ namespace UnityEngine.Rendering.Universal
             }
         }
 
+        public static int maxVisibleAdditionalLightWithCookies
+        {
+            // The limit is from the number of sampler and tex2D/texCube of cookies that we should declare in the Input.hlsl
+            // For example Direct3D 11 allows using up to 128 textures in a single shader, but only up to 16 samplers.
+            get { return 4; }
+        }
+
         // Internal max count for how many ScriptableRendererData can be added to a single Universal RP asset
         internal static int maxScriptableRenderers
         {
