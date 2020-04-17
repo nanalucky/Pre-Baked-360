@@ -32,6 +32,8 @@ Shader "Hidden/TerrainEngine/Details/UniversalPipeline/Vertexlit"
             #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile _ _SHADOWS_SOFT
             #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile _ _MAIN_LIGHT_COOKIE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_COOKIE
 
             // -------------------------------------
             // Unity defined keywords
