@@ -14,7 +14,7 @@ void MainLight_float(float3 WorldPos, out float3 Color, out float DistanceAtten,
 #else
     float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);
 #endif
-    Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, WorldPos);
     Color = mainLight.color;
     DistanceAtten = mainLight.distanceAttenuation;
     ShadowAtten = mainLight.shadowAttenuation;
