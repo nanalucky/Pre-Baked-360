@@ -86,7 +86,7 @@ Shader "Hidden/TerrainEngine/Details/UniversalPipeline/Vertexlit"
 
                 // Vertex Lighting
                 half3 NormalWS = input.NormalOS;
-                Light mainLight = GetMainLight();
+                Light mainLight = GetMainLight(vertexInput.positionWS);
                 half3 attenuatedLightColor = mainLight.color * mainLight.distanceAttenuation;
                 half3 diffuseColor = LightingLambert(attenuatedLightColor, mainLight.direction, NormalWS);
             #ifdef _ADDITIONAL_LIGHTS

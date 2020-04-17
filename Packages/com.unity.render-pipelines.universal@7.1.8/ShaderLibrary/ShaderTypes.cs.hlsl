@@ -15,6 +15,12 @@ struct LightData
     float4 occlusionProbeChannels;
 };
 
+struct cookieData
+{
+    float4x4 worldToLightMatrix;
+    int cookieIndex;
+};
+
 // Generated from UnityEngine.Rendering.Universal.ShaderInput+ShadowData
 // PackingRules = Exact
 struct ShadowData

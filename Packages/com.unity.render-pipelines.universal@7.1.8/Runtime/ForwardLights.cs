@@ -233,10 +233,10 @@ namespace UnityEngine.Rendering.Universal.Internal
                 cookie.texure = light.cookie;
 
                 cookie.worldToLight = light.transform.worldToLocalMatrix;
-                //if (lightData.lightType == LightType.Directional)
-                //{
-                //    cookie.worldToLight = Matrix4x4.Scale(new Vector3(light.cookieSize, light.cookieSize, 1.0f)) * cookie.worldToLight;
-                //}
+                if (lightData.lightType == LightType.Directional)
+                {
+                    cookie.worldToLight = Matrix4x4.Scale(new Vector3(1.0f/light.cookieSize, 1.0f/light.cookieSize, 1.0f)) * cookie.worldToLight;
+                }
             }
 
             // Set the occlusion probe channel.
@@ -356,6 +356,7 @@ namespace UnityEngine.Rendering.Universal.Internal
                     
                     cmd.SetGlobalBuffer(m_AdditionalLightsBufferId, lightDataBuffer);
                     cmd.SetGlobalBuffer(m_AdditionalLightsIndicesId, lightIndicesBuffer);
+                    cmd.SetGlobalBuffer(m_AdditionalLightsCookieBufferId, cookieDataBuffer);
 
                     additionalLightsData.Dispose();
                     cookieDataBuffer.Dispose();
