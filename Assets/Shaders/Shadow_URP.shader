@@ -24,7 +24,7 @@ Shader "Custom/ShadowURP"
 
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite On
-            Cull Off
+            //Cull Off
 
             HLSLPROGRAM
             #pragma prefer_hlslcc gles
