@@ -50,25 +50,32 @@ float4 _ScaledScreenParams;
 float4 _MainLightPosition;
 half4 _MainLightColor;
 
+#ifdef _MAIN_LIGHT_COOKIE
 float4x4 _MainLightWorldToLight;
 sampler2D _MainLightCookieTexture;
+#endif
 
 half4 _AdditionalLightsCount;
 #if USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
 StructuredBuffer<LightData> _AdditionalLightsBuffer;
 StructuredBuffer<int> _AdditionalLightsIndices;
+#ifdef _ADDITIONAL_LIGHTS_COOKIE
 StructuredBuffer<CookieData> _AdditionalLightsCookieBuffer;
+#endif
 #else
 float4 _AdditionalLightsPosition[MAX_VISIBLE_LIGHTS];
 half4 _AdditionalLightsColor[MAX_VISIBLE_LIGHTS];
 half4 _AdditionalLightsAttenuation[MAX_VISIBLE_LIGHTS];
 half4 _AdditionalLightsSpotDir[MAX_VISIBLE_LIGHTS];
 half4 _AdditionalLightsOcclusionProbes[MAX_VISIBLE_LIGHTS];
+#ifdef _ADDITIONAL_LIGHTS_COOKIE
 float _AdditionalLightsCookieIndexs[MAX_VISIBLE_LIGHTS];
 float4x4 _AdditionalPointLightsWorldToLight[MAX_VISIBLE_LIGHT_WITH_COOKIES];
 float4x4 _AdditionalSpotLightsWorldToLight[MAX_VISIBLE_LIGHT_WITH_COOKIES];
 #endif
+#endif
 
+#ifdef _ADDITIONAL_LIGHTS_COOKIE
 samplerCUBE _PointCookieTexture1;
 samplerCUBE _PointCookieTexture2;
 samplerCUBE _PointCookieTexture3;
@@ -77,7 +84,7 @@ sampler2D _SpotCookieTexture1;
 sampler2D _SpotCookieTexture2;
 sampler2D _SpotCookieTexture3;
 sampler2D _SpotCookieTexture4;
-
+#endif
 
 #define UNITY_MATRIX_M     unity_ObjectToWorld
 #define UNITY_MATRIX_I_M   unity_WorldToObject

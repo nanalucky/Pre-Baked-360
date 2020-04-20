@@ -91,6 +91,7 @@ half AngleAttenuation(half3 spotDirection, half3 lightDirection, half2 spotAtten
     return atten * atten;
 }
 
+#ifdef _ADDITIONAL_LIGHTS_COOKIE
 half SamplePointCookie(int cookieIndex, float4 lightCoord)
 {
     switch(cookieIndex)
@@ -124,6 +125,7 @@ half SampleSpotCookie(int cookieIndex, float4 lightCoord)
         return 1;
 	}
 }
+#endif
 
 // cookieIndex;
 // 0: invalid
