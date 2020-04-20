@@ -53,22 +53,22 @@ public class RoomSwitcher : MonoBehaviour {
             roomID = int.Parse(roomName);
           
             //if go with change render queue way
-            Material room_M = rooms[i].GetComponent<MeshRenderer>().material;
+            //Material room_M = rooms[i].GetComponent<MeshRenderer>().material;
 
             if (roomID == LiveCamID)
             {
                 //change material render queue
-                room_M.renderQueue = 2000;
+                //room_M.renderQueue = 2000;
 
                 //active gameobject
-                //rooms[i].transform.gameObject.SetActive(true);
+                rooms[i].transform.gameObject.SetActive(true);
             }
             else
             {
                 //set render queue to 0
-                room_M.renderQueue = 0;
+                //room_M.renderQueue = 0;
                 //deactive gameobject
-                //rooms[i].transform.gameObject.SetActive(false);
+                rooms[i].transform.gameObject.SetActive(false);
             }
         }
 
@@ -80,24 +80,24 @@ public class RoomSwitcher : MonoBehaviour {
             maskID = int.Parse(maskName);
 
             //if go with change render queue way
-            Material mask_M = masks[i].GetComponent<MeshRenderer>().material;
+            //Material mask_M = masks[i].GetComponent<MeshRenderer>().material;
 
             if (maskID == LiveCamID)
             {
                 //change material render queue
-                mask_M.renderQueue = 3000;
+                //mask_M.renderQueue = 3000;
 
                 //active mask game object
-                //masks[i].transform.gameObject.SetActive(true);
+                masks[i].transform.gameObject.SetActive(true);
 
             }
             else
             {
                 //change render queue to 0
-                mask_M.renderQueue = 0;
+                //mask_M.renderQueue = 0;
 
                 //deactive gameobject
-                //masks[i].transform.gameObject.SetActive(false);
+                masks[i].transform.gameObject.SetActive(false);
 
             }
         }
